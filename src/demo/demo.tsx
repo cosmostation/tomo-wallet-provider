@@ -16,7 +16,7 @@ import {
   // @ts-ignore
 } from '@tomo-inc/wallet-connect-sdk/dist/state'
 import '@tomo-inc/wallet-connect-sdk/style.css'
-import { btcWalletList, cosmosWalletList, Network } from '../main'
+import { btcWalletList, cosmosWalletList, InscriptionResult, Network, UTXO } from '../main'
 
 // window.injectedTomo = {
 //   info: {
@@ -68,6 +68,16 @@ export function ChildComponent(props: ChildProps) {
   const [curChainType, setCurChainType] = useState<ChainType>('bitcoin')
 
   const [testGetAddress, setTestGetAddress] = useState('')
+  const [testGetBalance, setTestGetBalance] = useState(0)
+  const [testGetNetwork, setTestGetNetwork] = useState('')
+  const [testSwitchNetwork, setTestSwitchNetwork] = useState('')
+  const [testgetBTCTipHeight, setTestgetBTCTipHeight] = useState(0)
+  const [testgetUtxos, setTestgetUtxos] = useState<UTXO[]>([]) 
+  const [testgetInscriptions, setTestgetInscriptions] = useState<InscriptionResult>() 
+  const [testPushTx, setTestPushTx] = useState('') 
+  const [testSendBtc, setTestSendBtc] = useState('') 
+
+
 
   const sendAtom = async (address: string, amount: string) => {
     if (!providers.cosmosProvider) {
@@ -448,6 +458,183 @@ export function ChildComponent(props: ChildProps) {
             </LodingButton>
             <div>{testGetAddress}</div>
           </div>
+
+          <div>
+            {/* NOTE For Test */}
+            <LodingButton
+              disabled={!btcIsConnect}
+              onClick={async () => {
+                try {
+                  const result = await providers.bitcoinProvider?.getBalance()
+                  setTestGetBalance(result || 0)
+                } catch (e) {
+                  console.log(e)
+                }
+              }}
+            >
+              btc getBalance()
+            </LodingButton>
+            <div>{testGetBalance}</div>
+          </div>
+
+          <div>
+            {/* NOTE For Test */}
+            <LodingButton
+              disabled={!btcIsConnect}
+              onClick={async () => {
+                try {
+                  const result = await providers.bitcoinProvider?.getNetwork()
+                  setTestGetNetwork(result || '')
+                } catch (e) {
+                  console.log(e)
+                }
+              }}
+            >
+              btc getNetwork()
+            </LodingButton>
+            <div>{testGetNetwork}</div>
+          </div>
+
+          <div>
+            <LodingButton
+              disabled={!btcIsConnect}
+              onClick={async () => {
+                try {
+                 await providers.bitcoinProvider?.switchNetwork(Network.MAINNET)
+                 setTestSwitchNetwork('mainnet')
+                } catch (e) {
+                  console.log(e)
+                }
+              }}
+            >
+              btc switchNetworkToMain()
+            </LodingButton>
+            <div>{testSwitchNetwork}</div>
+          </div>
+
+          <div>
+            <LodingButton
+              disabled={!btcIsConnect}
+              onClick={async () => {
+                try {
+                 await providers.bitcoinProvider?.switchNetwork(Network.SIGNET)
+                 setTestSwitchNetwork('signet')
+
+                } catch (e) {
+                  console.log(e)
+                }
+              }}
+            >
+              btc switchNetworkToSignet()
+            </LodingButton>
+            <div>{testSwitchNetwork}</div>
+          </div>
+
+          <div>
+            <LodingButton
+              disabled={!btcIsConnect}
+              onClick={async () => {
+                try {
+                 const result = await providers.bitcoinProvider?.getBTCTipHeight()
+                 setTestgetBTCTipHeight(result || 0)
+
+                } catch (e) {
+                  console.log(e)
+                }
+              }}
+            >
+              btc getBTCTipHeight()
+            </LodingButton>
+            <div>{testgetBTCTipHeight}</div>
+          </div>
+
+          <div>
+            <LodingButton
+              disabled={!btcIsConnect}
+              onClick={async () => {
+                try {
+
+                 const result = await providers.bitcoinProvider?.getUtxos(await providers.bitcoinProvider?.getAddress())
+                 setTestgetUtxos(result || [])
+                 console.log(result)
+
+                } catch (e) {
+                  console.log(e)
+                }
+              }}
+            >
+              btc getUtxos()
+            </LodingButton>
+            <div>{testgetUtxos.find(x=>x!==undefined)?.txid || ''}</div>
+          </div>
+
+          <div>
+            <LodingButton
+              disabled={!btcIsConnect}
+              onClick={async () => {
+                try {
+
+                 const result = await providers.bitcoinProvider?.getInscriptions()
+                 setTestgetInscriptions(result)
+                 console.log(result)
+
+                } catch (e) {
+                  console.log(e)
+                }
+              }}
+            >
+              btc getInscriptions()
+            </LodingButton>
+            <div>{`${testgetInscriptions?.total}`}</div>
+          </div>
+
+          <div>
+            <LodingButton
+              disabled={!btcIsConnect}
+              onClick={async () => {
+                try {
+
+                 const result = await providers.bitcoinProvider?.pushTx('02000000000101fcd432b3c65a28542b042f6f37815d98e3011a58b06847e9cc35e04e73cd48bc0100000000ffffffff021027000000000000160014de303a7dd3ca0d4c7ad4408063283d20e27eb82080171e0000000000160014267eefafde046a01bb4304013c1bcc0330f2032202473044022066967ef2cf14058b3dfadc8ed542623ac485d31f5e435b0cda1e0362cf4d47a002204df58e8c66763c8f5e347f9cf72b8c78022f3b74871268acde7a0a1dd39068b201210209375d3e71b0c54a7081e865a7139e7ef49c227e95e7aedb7ec0700819392a4500000000')
+                 setTestPushTx(result || '')
+                 console.log(result)
+
+                } catch (e) {
+                  console.log(e)
+                }
+              }}
+            >
+              btc PushTx()
+            </LodingButton>
+            <div>{testPushTx}</div>
+          </div>
+
+          <div>
+            <LodingButton
+              disabled={!btcIsConnect}
+              onClick={async () => {
+                try {
+                  const signetAddress = 'tb1qvt6le2cce3cgnkxt8xrf5ufzftlfpv24gxgamu'
+                  const mainnetAddress = 'bc1qzjgzf8cjma3eg530fc5zypj7kmgwt48wxtpruu'
+                  let address = ''
+                  if (await providers.bitcoinProvider?.getNetwork() == Network.MAINNET) {
+                    address = mainnetAddress
+                  } else {
+                    address = signetAddress
+                  }
+                  const result = await providers.bitcoinProvider?.sendBitcoin(address, 100)
+                  setTestSendBtc(result || 'fail')
+                  console.log(result)
+
+                } catch (e) {
+                  console.log(e)
+                }
+              }}
+            >
+              btc SendBTC()
+            </LodingButton>
+            <div>{testSendBtc}</div>
+          </div>
+
 
           <TomoSocial chainType={curChainType} />
         </div>
