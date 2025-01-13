@@ -76,6 +76,9 @@ export function ChildComponent(props: ChildProps) {
   const [testgetInscriptions, setTestgetInscriptions] = useState<InscriptionResult>() 
   const [testPushTx, setTestPushTx] = useState('') 
   const [testSendBtc, setTestSendBtc] = useState('') 
+  const [testSignMessageEcdsa, setTestSignMessageEcdsa] = useState('') 
+  const [testSignMessageBip322Simple, setTestSignMessageBip322Simple] = useState('') 
+  const [testSignMessageBip322Custom,setTestSignMessageBip322Custom] = useState('') 
 
 
 
@@ -635,6 +638,66 @@ export function ChildComponent(props: ChildProps) {
             <div>{testSendBtc}</div>
           </div>
 
+          <div>
+            <LodingButton
+              disabled={!btcIsConnect}
+              onClick={async () => {
+                try {
+                  const result = await providers.bitcoinProvider?.signMessage(
+                    '11',
+                    'ecdsa'
+                  )
+                  setTestSignMessageEcdsa(result || 'fail')
+                  console.log('btc signMessage ecdsa', result)
+                } catch (e) {
+                  console.log(e)
+                }
+              }}
+            >
+              btc signMessage('11', 'ecdsa')
+            </LodingButton>
+            <div>{testSignMessageEcdsa}</div>
+          </div>
+
+          <div>
+            <LodingButton
+              disabled={!btcIsConnect}
+              onClick={async () => {
+                try {
+                  const result = await providers.bitcoinProvider?.signMessage(
+                    '11',
+                    'bip322-simple'
+                  )
+                  setTestSignMessageBip322Simple(result || 'fail')
+                  console.log('btc signMessage bip322-simple', result)
+                } catch (e) {
+                  console.log(e)
+                }
+              }}
+            >
+              btc signMessage('11', 'bip322-simple')
+            </LodingButton>
+            <div>{testSignMessageBip322Simple}</div>
+          </div>
+
+          <div>
+            <LodingButton
+              disabled={!btcIsConnect}
+              onClick={async () => {
+                try {
+                  const result = await providers.bitcoinProvider?.signMessageBIP322('11')
+                  setTestSignMessageBip322Custom(result || 'fail')
+                  console.log('btc signMessage bip322-simple-custom', result)
+                } catch (e) {
+                  console.log(e)
+                }
+              }}
+
+            >
+              btc signMessage('11', 'bip322-simple-custom')
+            </LodingButton>
+            <div>{testSignMessageBip322Custom}</div>
+          </div>
 
           <TomoSocial chainType={curChainType} />
         </div>
